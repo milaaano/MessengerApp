@@ -1,6 +1,9 @@
 # .env
 backend/backend.env
 frontend/frontend.env
+*.env
 
 # node_modules
 */node_modules
+
+*.log

@@ -4,13 +4,13 @@ const routes = {
     '/': {
         GET: controllers.getHomePage,
     },
-    '/signup': {
+    '/auth/signup': {
         POST: controllers.signup,
     },
-    '/login': {
+    '/auth/login': {
         POST: controllers.login,
     },
-    '/logout': {
+    '/auth/logout': {
         POST: controllers.logout,
     }
 };

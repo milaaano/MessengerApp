@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/index.js"
+    "start": "./scripts/starting_script.bash",
+    "setup": "./scripts/setup_script.bash"
   },
   "keywords": [],
   "author": "",
