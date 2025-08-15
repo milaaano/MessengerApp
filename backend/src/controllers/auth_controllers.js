@@ -1,4 +1,4 @@
-import { generateToken } from '../lib/utils.js';
+import { generateToken, setCookie } from '../lib/utils.js';
 import { User } from '../database/user_model.js';
 import bcrypt from "bcryptjs";
 // import cloudinary from '../lib/cloudinary.js';
@@ -93,8 +93,15 @@ export const signup = async (req, res) => {
 };
 
 export const logout = (req, res) => {
-    res.writeHead(200, {"Content-Type": 'text/html'});
-    res.end("Logout Page");
+    try {
+        setCookie(res, "jwt", "", { maxAge: 0, secure: process.env.NODE_ENV !== "dev" });
+        res.writeHead(200, {"Content-Type": 'text/html'});
+        res.end(JSON.stringify({ message: "Logged out successfully." }));
+    } catch (err) {
+        console.log("Error in logout handler: ", err);
+        res.writeHead(500, {"Content-Type": 'text/html'});
+        res.end(JSON.stringify({ message: "Internal server error" }));
+    }
 };
 
 export const getHomePage = (req, res) => {
