@@ -51,3 +51,36 @@ export const parseJSONBody = async (req) => {
 
     });
 };
+
+export const runHandler = (handlers, req, res) => {
+    let idx = -1;
+
+    const handleError = (err) => {
+        if (res.writableEnded) return;
+        console.error("Error in some handler: ", err.message);
+        res.writeHead(500, { 'Content-Type': 'text/html' });
+        res.end(JSON.stringify({ message: 'Internal server error' }));
+    };
+
+    const next = (err) => {
+        if (err) return handleError(err);
+        if (res.writableEnded) return;
+
+        idx++;
+        if (idx >= handlers.length) return;
+
+        const fn = handlers[idx];
+        if (!fn) return;
+
+        try {
+            const result = fn(req, res, next);
+            if (result && typeof result.then === 'function') {
+                result.catch(handleError);
+            }
+        } catch (e) {
+            handleError(e);
+        }
+    };
+
+    next();
+};

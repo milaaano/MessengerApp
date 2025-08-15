@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import routes from './routes/auth_routes.js';
-import { parseJSONBody } from './lib/utils.js';
+import { parseJSONBody, runHandler } from './lib/utils.js';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -25,7 +25,7 @@ const server = http.createServer(async (req, res) => {
     const route = routes[url];
 
     if (route && route[method]) {
-        await route[method](req, res);
+        runHandler(route[method], req, res);
     } else {
         res.writeHead(404, { 'Content-Type': 'text/plain' });
         res.end("Not Found");
