@@ -5,9 +5,32 @@ import bcrypt from "bcryptjs";
 import pool from '../database/database.js';
 
 
-export const login = (req, res) => {
-    res.writeHead(200, {"Content-Type": 'text/html'});
-    res.end("Login Page");
+export const login = async (req, res) => {
+    const { email, password } = req.body;
+
+    try {
+        const user = await User.findByEmail(pool, email);
+        if (!user) {
+            res.writeHead(400, {'Content-Type': 'text/html'});
+            return res.end(JSON.stringify({message: `User ${email} does not exist.`}));
+        }
+
+        const is_password_correct = await bcrypt.compare(password, user.password_hash);
+
+        if (!is_password_correct) {
+            res.writeHead(400, {'Content-Type': 'text/html'});
+            return res.end(JSON.stringify({message: `Wrong password.`}));
+        }
+
+        generateToken(user.id, res);
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        return res.end(JSON.stringify({ message: "Logged in successfully." }));
+
+    } catch (err) {
+        console.log("Error in controllers, login:", err.message);
+        res.writeHead(500, {'Content-Type': 'text/html'});
+        res.end(JSON.stringify({ message: "Internal server error." }));
+    }
 };
 
 export const signup = async (req, res) => {
@@ -15,7 +38,7 @@ export const signup = async (req, res) => {
 
     try {
         if (!email || !full_name || !password) {
-            res.writeHead(400, {'Content-Type': 'text/plain'});
+            res.writeHead(400, {'Content-Type': 'text/html'});
             res.end(JSON.stringify({message: "All fields are required"}));
             return res;
         }
