@@ -2,7 +2,7 @@ import http from 'http';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import routes from './routes/auth_routes.js';
+import auth_routes from './routes/auth_routes.js';
 import { parseJSONBody, runHandler } from './lib/utils.js';
 
 
@@ -20,9 +20,15 @@ const server = http.createServer(async (req, res) => {
         res.writeHead(400, { 'Content-Type': 'text/plain' })
         return res.end(JSON.stringify({ error: err.message }));
     }
-    
 
-    const route = routes[url];
+    console.log(url.startsWith('/api/auth'));
+
+    let route;
+    if (url.startsWith('/api/auth')) {
+        route = auth_routes['/' + url.split('/')[3]];
+    } else if (url.startsWith('/api/messages')) {
+        route = message_routes['/' + url.split('/')[3]];
+    }
 
     if (route && route[method]) {
         runHandler(route[method], req, res);
