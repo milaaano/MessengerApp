@@ -104,7 +104,6 @@ export const logout = (req, res) => {
     }
 };
 
-export const updateProfile = (req, res, next) => {
-    console.log("updateProfile", req.user);
-    return res.end();
+export const updateProfile = async (req, res, next) => {
+    
 }

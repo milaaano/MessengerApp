@@ -1,16 +1,16 @@
-import http from 'http';
 import dotenv from 'dotenv';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import auth_routes from './routes/auth_routes.js';
-import { parseJSONBody, runHandler } from './lib/utils.js';
-import { parseCookies } from './lib/utils.js';
-
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.join(__dirname, '../backend.env') });
+
+import http from 'http';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import auth_routes from './routes/auth_routes.js';
+import { parseJSONBody, runHandler } from './lib/utils.js';
+import { parseCookies } from './lib/utils.js';
 
 const server = http.createServer(async (req, res) => {
     const { url, method } = req;
