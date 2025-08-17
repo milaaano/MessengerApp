@@ -12,7 +12,7 @@ const auth_routes = {
         POST: [controllers.logout],
     },
     '/update-profile': {
-        PATCH: [middleware.protectRoute, controllers.updateProfile],
+        PUT: [middleware.protectRoute, controllers.updateProfile],
     },
     // '/check': {
     //     GET: [protectRoute, checkAuth],

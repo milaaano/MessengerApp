@@ -12,9 +12,11 @@ export const setCookie = (res, name, value, { maxAge, httpOnly = true, secure = 
 };
 
 export const generateToken = (userId, res) => {
-    const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
-        expiresIn: "1d"
-    });
+    const token = jwt.sign(
+        { userId },
+        process.env.JWT_SECRET, 
+        { expiresIn: "1d" }
+    );
 
     setCookie(res, "jwt", token, {
         maxAge: 3600 * 24,
@@ -24,6 +26,20 @@ export const generateToken = (userId, res) => {
     return token;
 };
 
+export const parseCookies = (cookieHeader) => {
+    const cookies = {};
+
+    if (!cookieHeader) return cookies;
+
+    const parts = cookieHeader.split(';').map( item => item.trim());
+    
+    parts.forEach(item => {
+        const [key, val] = item.split('=');
+        cookies[key] = val;
+    });
+
+    return cookies;
+};
 
 export const parseJSONBody = async (req) => {
     return new Promise((resolve, reject) => {
@@ -58,7 +74,7 @@ export const runHandler = (handlers, req, res) => {
     const handleError = (err) => {
         if (res.writableEnded) return;
         console.error("Error in some handler: ", err.message);
-        res.writeHead(500, { 'Content-Type': 'text/html' });
+        res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ message: 'Internal server error' }));
     };
 
@@ -84,3 +100,5 @@ export const runHandler = (handlers, req, res) => {
 
     next();
 };
+
+

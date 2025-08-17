@@ -103,3 +103,8 @@ export const logout = (req, res) => {
         res.end(JSON.stringify({ message: "Internal server error" }));
     }
 };
+
+export const updateProfile = (req, res, next) => {
+    console.log("updateProfile", req.user);
+    return res.end();
+}

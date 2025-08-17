@@ -4,6 +4,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import auth_routes from './routes/auth_routes.js';
 import { parseJSONBody, runHandler } from './lib/utils.js';
+import { parseCookies } from './lib/utils.js';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -20,8 +21,6 @@ const server = http.createServer(async (req, res) => {
         res.writeHead(400, { 'Content-Type': 'text/plain' })
         return res.end(JSON.stringify({ error: err.message }));
     }
-
-    console.log(url.startsWith('/api/auth'));
 
     let route;
     if (url.startsWith('/api/auth')) {
