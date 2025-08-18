@@ -14,9 +14,9 @@ const auth_routes = {
     '/update-profile': {
         PUT: [middleware.protectRoute, controllers.updateProfile],
     },
-    // '/check': {
-    //     GET: [protectRoute, checkAuth],
-    // }
+    '/check': {
+        GET: [middleware.protectRoute, controllers.checkAuth],
+    }
 };
 
 export default auth_routes;

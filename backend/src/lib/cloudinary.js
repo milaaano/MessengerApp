@@ -8,4 +8,4 @@ cloudinary.config({
     secure: process.env.NODE_ENV !== "dev",
 });
 
-export default cloud;
+export default cloudinary;

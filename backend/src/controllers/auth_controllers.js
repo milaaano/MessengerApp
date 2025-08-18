@@ -1,7 +1,7 @@
 import { generateToken, setCookie } from '../lib/utils.js';
 import { User } from '../database/user_model.js';
 import bcrypt from "bcryptjs";
-// import cloudinary from '../lib/cloudinary.js';
+import cloudinary from '../lib/cloudinary.js';
 import pool from '../database/database.js';
 
 
@@ -105,5 +105,29 @@ export const logout = (req, res) => {
 };
 
 export const updateProfile = async (req, res, next) => {
-    
+    try {
+        const { profile_pic, email, full_name } = req.body;
+
+        const user = req.user;
+        
+        if (!user) throw new Error('User does not exist.');
+
+        let pic_upload_res = null;
+        if (profile_pic) {
+            pic_upload_res = await cloudinary.uploader.upload(profile_pic);
+        }
+
+        const updated_user = await User.findByIdAndUpdate(
+            pool,
+            user.id,
+            { profile_pic: pic_upload_res ? pic_upload_res.secure_url : pic_upload_res, email, full_name },
+            { new: true }
+        );
+
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify(updated_user));
+    } catch (err) {
+        console.log("Error in updateProfile");
+        next(err);
+    }
 }

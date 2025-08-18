@@ -50,7 +50,6 @@ export class User {
         return new User(rows[0]);
     }
 
-
     async #update(pool, data) {
         const setParts = [];
         const values = [this.id]; 
@@ -58,6 +57,7 @@ export class User {
         let idx = 2;
         for (const key in data) {
             if (!User.#allowed_columns.has(key)) continue;
+            if (key !== 'profile_pic' && (data[key] === null || data[key] === undefined || data[key] === '')) continue;
             setParts.push(`${key} = $${idx++}`);
             values.push(data[key]);
         }
