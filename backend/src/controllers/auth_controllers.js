@@ -131,3 +131,14 @@ export const updateProfile = async (req, res, next) => {
         next(err);
     }
 }
+
+export const checkAuth = (req, res, next) => {
+    try {
+        if (!req.user) throw new Error("User does not exist.");
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify(req.user));
+    } catch (err) {
+        console.log("Error in checkAuth.");
+        next(err);
+    }
+}
