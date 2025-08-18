@@ -107,7 +107,7 @@ export const updateProfile = async (req, res, next) => {
         
         if (!user) throw new Error('User does not exist.');
 
-        let pic_upload_res = null;
+        let pic_upload_res = "";
         if (profile_pic) {
             pic_upload_res = await cloudinary.uploader.upload(profile_pic);
         }
@@ -120,7 +120,7 @@ export const updateProfile = async (req, res, next) => {
         );
 
         res.writeHead(200, {'Content-Type': 'application/json'});
-        res.end(JSON.stringify(updated_user));
+        res.end(JSON.stringify(updated_user.exclude([password_hash])));
     } catch (err) {
         console.log("Error in updateProfile");
         next(err);
