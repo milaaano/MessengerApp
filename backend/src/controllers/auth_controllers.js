@@ -23,8 +23,8 @@ export const login = async (req, res) => {
         }
 
         generateToken(user.id, res);
-        res.writeHead(200, {'Content-Type': 'text/html'});
-        return res.end(JSON.stringify({ message: "Logged in successfully." }));
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify(user.exclude(['password_hash'])));
 
     } catch (err) {
         console.log("Error in controllers, login:", err.message);
@@ -68,16 +68,11 @@ export const signup = async (req, res) => {
 
         if (new_user) {
             const added_user = await new_user.save(pool);
-            const { id } = added_user.rows[0];
-            generateToken(new_user.id, res);
+            const { id } = added_user.id;
+            generateToken(added_user.id, res);
 
-            res.statusCode = 200;
-            res.end(JSON.stringify({
-                id,
-                email: new_user.email,
-                full_name: new_user.full_name,
-                profile_pic: new_user.profile_pic
-            }));
+            res.writeHead(200, { 'Content-Type': 'application/json' });
+            res.end(JSON.stringify(added_user.exclude(['password_hash'])));
         } else {
             res.statusCode = 400;
             res.end(JSON.stringify({
@@ -87,7 +82,7 @@ export const signup = async (req, res) => {
 
     } catch (err) {
         console.log("Error in signup controller:", err.message);
-        res.statusCode = 500;
+        res.writeHead(500, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({message: "Internal Server Error"}));
     }
 };

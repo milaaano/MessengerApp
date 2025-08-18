@@ -21,7 +21,7 @@ export const protectRoute = async (req, res, next) => {
             return res.end(JSON.stringify({ message: "Unauthorized: not token provided." }));
         }
 
-        const user = await User.findById(pool, decoded.userId);
+        const user = (await User.findById(pool, decoded.userId)).exclude(['password_hash']);
 
         if (!user) {
             res.stausCode = 400;
@@ -32,7 +32,7 @@ export const protectRoute = async (req, res, next) => {
 
         next()
     } catch (err) {
-        console.log("Error in protectRoute middleware: ", err.message);
+        console.log("Error in protectRoute middleware.");
         next(err);
     }
 }

@@ -69,7 +69,7 @@ export class User {
         setParts.push(`updated_at = NOW()`);
 
         const query = {
-            text: `UPDATE users SET ${setParts.join(', ')} WHERE id = $1 RETURNING *`,
+            text: `UPDATE users SET ${setParts.join(', ')} WHERE id = $1 RETURNING `,
             values: values
         };
 
@@ -98,5 +98,14 @@ export class User {
             }
             throw(err);
         }
+    }
+
+    exclude(fields) {
+        const res = new User(this);
+        for (const field of fields) {
+            delete res[field];
+        }
+
+        return res;
     }
 }
