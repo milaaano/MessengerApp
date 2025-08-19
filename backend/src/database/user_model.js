@@ -8,6 +8,7 @@ export class User extends Model {
     };
     static table = "users";
     static save_columns = ['email', 'full_name', 'password_hash', 'profile_pic'];
+    static filter_columns = new Set(['id', 'email', 'full_name', 'password_hash', 'profile_pic', 'created_at', 'updated_at']);
 
     constructor({id = null, email, full_name, password_hash, profile_pic = '', created_at = null, updated_at = null}) {
         super();

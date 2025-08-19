@@ -2,19 +2,19 @@ import * as controllers from '../controllers/auth_controllers.js';
 import { protectRoute } from '../middleware/auth_middleware.js';
 
 const auth_routes = {
-    '/signup': { 
+    '/api/auth/signup': { 
         POST: [controllers.signup],
     },
-    '/login': {
+    '/api/auth/login': {
         POST: [controllers.login],
     },
-    '/logout': {
+    '/api/auth/logout': {
         POST: [controllers.logout],
     },
-    '/update-profile': {
+    '/api/auth/update-profile': {
         PUT: [protectRoute, controllers.updateProfile],
     },
-    '/check': {
+    '/api/auth/check': {
         GET: [protectRoute, controllers.checkAuth],
     }
 };

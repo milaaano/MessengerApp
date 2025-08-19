@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 
+// adds Set-header: set-cookie to the response
 export const setCookie = (res, name, value, { maxAge, httpOnly = true, secure = true, sameSite = 'strict', path = '/', domain } = {}) => {
   const parts = [`${name}=${value}`];
   if (maxAge) parts.push(`Max-Age=${maxAge}`);
@@ -11,6 +12,7 @@ export const setCookie = (res, name, value, { maxAge, httpOnly = true, secure = 
   res.setHeader('Set-Cookie', parts.join('; '));
 };
 
+// generates JWT token, bound to the userId
 export const generateToken = (userId, res) => {
     const token = jwt.sign(
         { userId },
@@ -26,6 +28,7 @@ export const generateToken = (userId, res) => {
     return token;
 };
 
+// accepts cookie heare value (string) and returns an object {cookie_name: cookie: value}
 export const parseCookies = (cookieHeader) => {
     const cookies = {};
 
@@ -41,6 +44,7 @@ export const parseCookies = (cookieHeader) => {
     return cookies;
 };
 
+// parses JSON body, chunk by chunk
 export const parseJSONBody = async (req) => {
     return new Promise((resolve, reject) => {
         let body = '';
@@ -68,6 +72,7 @@ export const parseJSONBody = async (req) => {
     });
 };
 
+// accepts an array of handlers; executes endpoints' handlers; contains fucntion next(), which executes next handler
 export const runHandler = (handlers, req, res) => {
     let idx = -1;
 
@@ -99,4 +104,45 @@ export const runHandler = (handlers, req, res) => {
     };
 
     next();
+};
+
+// accepts url and optional pattern (for example: /api/message/:id) to match url; returns JSON object (for {pathname: /api/message/:id, parts: ["api", "message", "52"], query_string: {param1: value1, ...}, params: { id: 52 }})
+export const parseURL = (url, pattern = "") => {
+    const pattern_parts = pattern.split("/").filter(Boolean);
+
+    const full_url = new URL(url, `${process.env.NODE_ENV !== "dev" ? 'https' : 'http'}://localhost:${process.env.PORT}`);
+    
+    const parsed = {
+        pathname: full_url.pathname,
+        parts: full_url.pathname.split('/').filter(Boolean),
+        query_string: Object.fromEntries(full_url.searchParams),
+        params: {}
+    }
+
+    if (pattern_parts.length !== parsed.parts.length) return null;
+
+    for (let i = 0; i < pattern_parts.length; i++) {
+        const seg = pattern_parts[i];
+        const part = parsed.parts[i];
+
+        if (seg.startsWith(':')) {
+            parsed.params[seg.slice(1)] = decodeURIComponent(part.slice(1));
+        } else {
+            if (seg !== part) return null;
+        }
+    }
+
+    return parsed;
+};
+
+export const findMatchURL = (url, routes) => {
+    let parsed;
+    for (const path of Object.keys(routes)) {
+        parsed = parseURL(url, path);
+        if (parsed) {
+            return { route: routes[path], parsed };
+        }
+    }
+
+    return null;
 };

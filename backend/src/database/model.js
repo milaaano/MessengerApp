@@ -3,6 +3,7 @@ export class Model {
     static queries = {}; // sql queries; to be defined in a subclasses
     static table = ""; // name of the table; to be defined in a subclass
     static save_columns = []; // columns that will be saved in database for new entry; to be defined in a subclass
+    static filter_columns = new Set(); // columns that will can filetered by in database queries; to be defined in a subclass
 
     async save(pool) {
         const cls = this.constructor;
@@ -78,20 +79,51 @@ export class Model {
         return new this.constructor(data);
     }
 
-    // among is restricting object, except is excluding object, both should contain ids of entries.
-    static async find(pool, config = { among: [], except: [] }) {
-        const { among = [], except = [] } = config;
+    // among - includes only given ids; except - excludes all the given ids; and/or - contains conditions (column: value) to be joined with AND/OR;
+    static async find(pool, config = { among: [], except: [], or: [], and: []}) {
+        const { among = [], except = [], and = [], or = [] } = config;
         const conditions = [];
         const values = [];
 
         let idx = 1;
+
+        // among
         if (among.length) {
-            conditions.push(`id = ANY($${idx++})`);
+            conditions.push(`id = ANY($${idx++}::bigint[])`);
             values.push(among);
         }
 
-        conditions.push(`id <> ALL($${idx++})`);
+        // except
+        conditions.push(`id <> ALL($${idx++}::bigint[])`);
         values.push(except);
+
+        // and
+        and.forEach(item => {
+            for (const key of Object.keys(item)) {
+                if (this.filter_columns.has(key)) {
+                    conditions.push(`${key} = $${idx++}`);
+                    values.push(item[key]);
+                }
+            }
+        });
+
+        // or
+        const or_conditions = [];
+        or.forEach(item => {
+            const part = [];
+            for (const key of Object.keys(item)) {
+                if (this.filter_columns.has(key)) {
+                    part.push(`${key} = $${idx++}`);
+                    values.push(item[key]);
+                }
+            }
+            if (part.length) {
+                or_conditions.push(`(${part.join(' AND ')})`);
+            }
+        });
+        if (or_conditions.length) {
+            conditions.push(`(${or_conditions.join(' OR ')})`);
+        }
 
         const query = {
             text: `SELECT * FROM ${this.table} WHERE ${conditions.join(' AND ')}`,

@@ -7,6 +7,7 @@ export class Message extends Model {
     };
     static table = "messages";
     static save_columns = ['sender_id', 'receiver_id', 'content', 'picture'];
+    static filter_columns = new Set(['id', 'sender_id', 'receiver_id', 'content', 'picture', 'created_at', 'updated_at']);
 
     constructor({id = null, sender_id, receiver_id, content = "", picture = "", created_at = null, updated_at = null}) {
         super();

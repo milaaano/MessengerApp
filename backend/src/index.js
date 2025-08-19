@@ -10,24 +10,31 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import auth_routes from './routes/auth_routes.js';
 import message_routes from './routes/message_routes.js';
-import { parseJSONBody, runHandler } from './lib/utils.js';
+import { parseJSONBody, runHandler, findMatchURL } from './lib/utils.js';
+
+const routes = {...auth_routes, ...message_routes};
 
 const server = http.createServer(async (req, res) => {
     const { url, method } = req;
+    const match = findMatchURL(url, routes);
+
+    if (!match) {
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ message: 'Not Found' }));
+    }
 
     try {
         req.body = await parseJSONBody(req);
     } catch (err) {
-        res.writeHead(400, { 'Content-Type': 'text/plain' })
+        res.writeHead(400, { 'Content-Type': 'application/json' })
         return res.end(JSON.stringify({ error: err.message }));
     }
 
-    let route;
-    if (url.startsWith('/api/auth')) {
-        route = auth_routes['/' + url.split('/')[3]];
-    } else if (url.startsWith('/api/message')) {
-        route = message_routes['/' + url.split('/')[3]];
-    }
+    const route = match.route;
+    req.pathname = match.parsed.pathname;
+    req.params   = match.parsed.params;
+    req.query    = match.parsed.query_string;
+    req.parts    = match.parsed.parts;
 
     if (route && route[method]) {
         runHandler(route[method], req, res);

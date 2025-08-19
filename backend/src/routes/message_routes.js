@@ -2,13 +2,16 @@ import * as controllers from '../controllers/message_controllers.js';
 import { protectRoute } from '../middleware/auth_middleware.js';
 
 const message_routes = {
-    '/users': { 
+    '/api/message/users': { 
         GET: [protectRoute, controllers.getUsersForSiderbar],
     },
-    '/:id': {
+    '/api/message/:id': {
         GET: [protectRoute, controllers.getMessages],
     },
-    
+    '/ap/message/send/:id': {
+        POST: [protectRoute, controllers.sendMessage],
+    }
+
 };
 
 export default message_routes;
