@@ -48,7 +48,9 @@ export class Model {
         return new this(rows[0]);
     }
 
-    async update() {}
+    async update() {
+        throw new Error(`${this.constructor.name}.update must be implemented`);
+    }
 
     static async findByIdAndUpdate(pool, id, data, config = { new: true }) {
         const model = await this.findById(pool, id);
@@ -68,12 +70,33 @@ export class Model {
     }
 
     exclude(fields) {
-        const res = new this.constructor(this);
-        for (const field of fields) {
-            delete res[field];
-        }
-
-        return res;
+        const data = { ...this };
+        for (const f of fields) delete data[f];
+        return new this.constructor(data);
     }
 
+    // among is restricting object, except is excluding object, both should contain ids of entries.
+    static async find(pool, config = { among: [], except: [] }) {
+        const { among = [], except = [] } = config;
+        const conditions = [];
+        const values = [];
+
+        let idx = 1;
+        if (among.length) {
+            conditions.push(`id = ANY($${idx++})`);
+            values.push(among);
+        }
+
+        conditions.push(`id <> ALL($${idx++})`);
+        values.push(except);
+
+        const query = {
+            text: `SELECT * FROM ${this.table} WHERE ${conditions.join(' AND ')}`,
+            values
+        }
+
+        const { rows } = await pool.query(query);
+
+        return rows.map(item => new this(item));
+    }
 }

@@ -9,8 +9,8 @@ import http from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import auth_routes from './routes/auth_routes.js';
+import message_routes from './routes/message_routes.js';
 import { parseJSONBody, runHandler } from './lib/utils.js';
-import { parseCookies } from './lib/utils.js';
 
 const server = http.createServer(async (req, res) => {
     const { url, method } = req;
@@ -25,7 +25,7 @@ const server = http.createServer(async (req, res) => {
     let route;
     if (url.startsWith('/api/auth')) {
         route = auth_routes['/' + url.split('/')[3]];
-    } else if (url.startsWith('/api/messages')) {
+    } else if (url.startsWith('/api/message')) {
         route = message_routes['/' + url.split('/')[3]];
     }
 

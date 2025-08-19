@@ -1,5 +1,5 @@
 import * as controllers from '../controllers/auth_controllers.js';
-import * as middleware from '../middleware/auth_middleware.js';
+import { protectRoute } from '../middleware/auth_middleware.js';
 
 const auth_routes = {
     '/signup': { 
@@ -12,10 +12,10 @@ const auth_routes = {
         POST: [controllers.logout],
     },
     '/update-profile': {
-        PUT: [middleware.protectRoute, controllers.updateProfile],
+        PUT: [protectRoute, controllers.updateProfile],
     },
     '/check': {
-        GET: [middleware.protectRoute, controllers.checkAuth],
+        GET: [protectRoute, controllers.checkAuth],
     }
 };
 
