@@ -13,13 +13,14 @@ export class User extends Model {
         super();
         this.id = (id !== null) ? Number(id) : null;
         this.email = email;
-        this.full_name = full_name;
+        this.full_name = full_name; 
         this.password_hash = password_hash;
         this.profile_pic = profile_pic;
         this.created_at = created_at;
         this.updated_at = updated_at;
     }
 
+    // helper function that updates db; data - is the data to update in format of key: value; can call it with empty profile_pic to delete avatar. 
     async update(pool, data) {
         const cls = this.constructor;
         const setParts = [];

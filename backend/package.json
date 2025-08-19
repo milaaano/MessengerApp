@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "./scripts/starting_script.bash",
-    "setup": "./scripts/setup_script.bash"
+    "build": "./scripts/setup_script.bash"
   },
   "keywords": [],
   "author": "",

@@ -19,6 +19,7 @@ export class Message extends Model {
         this.updated_at = updated_at;
     }
 
+    // updates database; if both picture and content are empty, throws an error
     async update(pool, data) {
         const cls = this.constructor;
         const setParts = [];
