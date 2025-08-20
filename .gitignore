@@ -7,3 +7,6 @@ frontend/frontend.env
 */node_modules
 
 *.log
+
+.VSCodeCounter/
+.VSCodeCounter
