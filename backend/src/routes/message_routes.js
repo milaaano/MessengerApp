@@ -8,7 +8,7 @@ const message_routes = {
     '/api/message/:id': {
         GET: [protectRoute, controllers.getMessages],
     },
-    '/ap/message/send/:id': {
+    '/api/message/send/:id': {
         POST: [protectRoute, controllers.sendMessage],
     }
 

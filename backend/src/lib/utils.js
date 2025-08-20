@@ -122,19 +122,20 @@ export const parseURL = (url, pattern = "") => {
     if (pattern_parts.length !== parsed.parts.length) return null;
 
     for (let i = 0; i < pattern_parts.length; i++) {
-        const seg = pattern_parts[i];
-        const part = parsed.parts[i];
+        const pattern_part = pattern_parts[i];
+        const url_part = parsed.parts[i];
 
-        if (seg.startsWith(':')) {
-            parsed.params[seg.slice(1)] = decodeURIComponent(part.slice(1));
+        if (pattern_part.startsWith(':')) {
+            parsed.params[pattern_part.slice(1)] = decodeURIComponent(url_part);
         } else {
-            if (seg !== part) return null;
+            if (pattern_part !== url_part) return null;
         }
     }
 
     return parsed;
 };
 
+// accepts url and routes object, which contains all the routes in API. Return methods object and parsed url object if a match found, else returns null
 export const findMatchURL = (url, routes) => {
     let parsed;
     for (const path of Object.keys(routes)) {

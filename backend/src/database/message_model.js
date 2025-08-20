@@ -1,3 +1,4 @@
+import { send } from "process";
 import { Model } from "./model.js";
 export class Message extends Model {
     static updatable_columns = new Set(['picture', 'content']);
@@ -11,9 +12,20 @@ export class Message extends Model {
 
     constructor({id = null, sender_id, receiver_id, content = "", picture = "", created_at = null, updated_at = null}) {
         super();
+        const sid = Number(sender_id);
+        const rid = Number(receiver_id);
+
+        if (!Number.isInteger(sid) || sid <= 0) {
+            throw new Error(`Invalid sender_id: ${sender_id}`);
+        }
+        if (!Number.isInteger(rid) || rid <= 0) {
+            throw new Error(`Invalid receiver_id: ${receiver_id}`);
+        }
+        if (sid === rid) throw new Error("sender_id cannot be equal to receiver_id");
+
         this.id = (id !== null) ? Number(id) : null;
-        this.sender_id = sender_id;
-        this.receiver_id = receiver_id;
+        this.sender_id = sid;
+        this.receiver_id = rid;
         this.content = content;
         this.picture = picture;
         this.created_at = created_at;

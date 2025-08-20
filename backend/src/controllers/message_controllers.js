@@ -41,9 +41,32 @@ export const getMessages = async (req, res, next) => {
 
 export const sendMessage = async (req, res, next) => {
     try {
-        const sender = req.user.id;
+        const sender_id = req.user.id;
+        const receiver_id = req.params.id;
+        const { content, picture } = req.body;
+
+        if (!sender_id || !receiver_id) {
+            res.writeHead(400, {'Content-Type': 'application/json'});
+            return res.end(JSON.stringify({ message: "Sender or receiver does not exist." }));
+        }
+
+        let pic_URL = null;
+        if (picture) {
+            const pic_upload_res = await cloudinary.uploader.upload(picture);
+            pic_URL = pic_upload_res.secure_url;
+        }
+
+        const message = new Message({ sender_id, receiver_id, content, picture: pic_URL});
+
+        const saved_message = await message.save(pool);
+
+        // todo: emit message to everyone in the room: socket.io
+
+        res.writeHead(200, {'Content-Type': 'application/json'});
+        res.end(JSON.stringify(saved_message));
 
     } catch (err) {
-
+        console.log("Error in sendMessage.");
+        next(err);
     }
 };
