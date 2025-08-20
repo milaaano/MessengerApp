@@ -2,6 +2,7 @@
 backend/backend.env
 frontend/frontend.env
 *.env
+frontend/.env
 
 # node_modules
 */node_modules
