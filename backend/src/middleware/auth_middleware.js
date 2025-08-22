@@ -10,21 +10,21 @@ export const protectRoute = async (req, res, next) => {
         const token = parseCookies(req.headers.cookie).jwt;
 
         if (!token) {
-            res.stausCode = 401;
+            res.writeHead(401, { "Content-Type": "application/json" });
             return res.end(JSON.stringify({ message: "Unauthorized: not token provided." }));
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         if (!decoded) {
-            res.stausCode = 401;
-            return res.end(JSON.stringify({ message: "Unauthorized: not token provided." }));
+            res.writeHead(401, { "Content-Type": "application/json" });
+            return res.end(JSON.stringify({ message: "Unauthorized: wrong token provided." }));
         }
 
         const user = (await User.findById(pool, decoded.userId)).exclude(['password_hash']);
 
         if (!user) {
-            res.stausCode = 400;
+            res.writeHead(400, { "Content-Type": "application/json" });
             return res.end(JSON.stringify({ message: "Unauthorized: user does not exist." }));
         }
 

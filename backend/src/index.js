@@ -14,6 +14,17 @@ dotenv.config({ path: path.join(__dirname, '../backend.env') });
 const routes = {...auth_routes, ...message_routes};
 
 const server = http.createServer(async (req, res) => {
+    res.setHeader("Access-Control-Allow-Origin", process.env.CLIENT_ORIGIN);
+    res.setHeader("Access-Control-Allow-Methods", process.env.CLIENT_ALLOWED_METHODS);
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.setHeader("Access-Control-Allow-Credentials", "true");
+
+    if (req.method === "OPTIONS") {
+        res.writeHead(204);
+        return res.end();
+    }
+
+
     const { url, method } = req;
     const match = findMatchURL(url, routes);
 
