@@ -4,10 +4,11 @@ import toast from "react-hot-toast";
 
 export const useAuthStore = create((set) => ({
     authUser: null,
+
     isSigningUp: false,
-    isLogginIn: false,
+    isLoggingIn: false,
     isUpdatingProfile: false,
-    isLogginOut: false,
+    isLoggingOut: false,
     isCheckingAuth: true,
 
     checkAuth: async () => {
@@ -38,17 +39,31 @@ export const useAuthStore = create((set) => ({
     },
 
     logout: async () => {
-        set({ isLogginOut: true });
+        set({ isLoggingOut: true });
         try {
             await axiosInstance.post("/auth/logout");
+            set({ authUser: null });
             toast.success("Logged out successfully.");
         } catch (err) {
             console.error("Error in logout under the frontend.");
             toast.error(err.response.data.message);
         } finally {
-            set({ isLogginOut: false });
+            set({ isLoggingOut: false });
         }
     },
 
+    login: async (data) => {
+        set({ isLoggingIn: true });
+        try {
+            const res = await axiosInstance.post('/auth/login', data);
+            toast.success("Logged in successfully.");
+            set({ authUser: res.data });
+        } catch (err) {
+            toast.error(err.response.data.message);
+            console.log("Error in login under the frontend.");
+        } finally {
+            set({ isLoggingIn: false });
+        }
+    }
 
 }));
