@@ -43,10 +43,23 @@ export const signup = async (req, res) => {
             return res;
         }
 
+        if (email.length > 320) {
+            res.writeHead(400, {'Content-Type': 'text/plain'});
+            return res.end(JSON.stringify({message: "Email is too long"}));
+        }
+
+        if (full_name.length > 255) {
+            res.writeHead(400, {'Content-Type': 'text/plain'});
+            return res.end(JSON.stringify({message: "Name is too long"}));
+        }
+
         if (password.length < 6) {
             res.writeHead(400, {'Content-Type': 'text/plain'});
             res.end(JSON.stringify({message: "Password must be at least 6 charachters"}));
             return res;
+        } else if (password.length > 1024) {
+            res.writeHead(400, {'Content-Type': 'text/plain'});
+            return res.end(JSON.stringify({message: "Password is to long"}));
         }
 
 
@@ -101,7 +114,7 @@ export const logout = (req, res) => {
 
 export const updateProfile = async (req, res, next) => {
     try {
-        const { profile_pic, email, full_name } = req.body;
+        const { profile_pic, email, full_name } = req.body; // will update everithing in the future, for now only profile_pic, so email and full_name are undefined
 
         const user = req.user;
         
