@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/UseAuthStore.js";
 import { Camera, Mail, Trash, User } from "lucide-react";
+import toast from "react-hot-toast";
 
 const ProfilePage = () => {
   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
@@ -20,6 +21,7 @@ const ProfilePage = () => {
     };
 
     reader.onerror = () => {
+      toast.error(reader.error);
       console.error(reader.error);
       return;
     }

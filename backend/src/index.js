@@ -49,8 +49,8 @@ const server = http.createServer(async (req, res) => {
     if (route && route[method]) {
         runHandler(route[method], req, res);
     } else {
-        res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.end("Not Found");
+        res.writeHead(404, { 'Content-Type': 'application/json' });
+        return res.end(JSON.stringify({ message: 'Not Found' }));
     }
 });
 
