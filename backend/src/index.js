@@ -4,7 +4,9 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import auth_routes from './routes/auth_routes.js';
 import message_routes from './routes/message_routes.js';
-import { parseJSONBody, runHandler, findMatchURL } from './lib/utils.js';
+import { parseJSONBody, runHandler, findMatchURL, parseCookies } from './lib/utils.js';
+import { Server } from 'socket.io';
+import jwt from 'jsonwebtoken';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -54,7 +56,50 @@ const server = http.createServer(async (req, res) => {
     }
 });
 
+const io = new Server(server);
+
+io.use((socket, next) => {
+    try {
+        if (!socket.handshake.headers.cookie) {
+            throw new Error("Cannot connect: no cookies provided");
+        }
+
+        const token = parseCookies(socket.handshake.headers.cookie).jwt;
+
+        if (!token) {
+            throw new Error("Cannot connect: no token provided");
+        }
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+        const delay = decoded.exp * 1000 - Date.now() - 30000;
+
+        if (delay <= 0) {
+            throw new Error("Connot connect: expired token");
+        }
+
+        socket.data.userId = decoded.userId;
+
+        setTimeout(() => {
+            socket.disconnect(true, "token_expired");
+        }, delay);
+
+        next();
+    } catch (err) {
+        next(err);
+    }
+});
+
+io.on("connection", (socket) => {
+    const userId = socket.data.userId;
+    socket.join(`user:${userId}`);
+
+
+});
+
 
 server.listen(process.env.PORT, () => {
     console.log(`HTTP server is running on port: ${process.env.PORT}`);
 });
+
+export { io };
