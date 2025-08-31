@@ -56,7 +56,14 @@ const server = http.createServer(async (req, res) => {
     }
 });
 
-const io = new Server(server);
+const io = new Server(server, {
+    cors: {
+        origin: process.env.CLIENT_ORIGIN,
+        credentials: true,
+    }
+});
+
+const userSocketsMap = new Map();
 
 io.use((socket, next) => {
     try {
@@ -94,6 +101,21 @@ io.on("connection", (socket) => {
     const userId = socket.data.userId;
     socket.join(`user:${userId}`);
 
+    console.log('a user connected via ', socket.id);
+    
+    if (!userSocketsMap.has(userId)) {
+        userSocketsMap.set(userId, new Set());
+    }
+    userSocketsMap.get(userId).add(socket.id);
+
+    socket.emit("getOnlineUsers", Array.from(userSocketsMap.keys()));
+
+    socket.on('disconnect', (message) => {
+        userSocketsMap.get(userId).delete(socket.id);
+        console.log(`Socket ${socket.id} was disconnected. Reason: ${message}`);
+
+        if (userSocketsMap[userId].size === 0) userSocketsMap.delete(userId);
+    });
 
 });
 

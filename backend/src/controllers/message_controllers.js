@@ -3,6 +3,7 @@ import { Message } from "../database/message_model.js";
 import pool from '../database/database.js';
 import { parseURL } from '../lib/utils.js';
 import cloudinary from '../lib/cloudinary.js';
+import { io } from '../index.js';
 
 export const getUsersForSiderbar = async (req, res, next) => {
     try {
@@ -60,7 +61,7 @@ export const sendMessage = async (req, res, next) => {
 
         const saved_message = await message.save(pool);
 
-        // todo: emit message to everyone in the room: socket.io
+        io.to([`user:${sender_id}`, `user:${receiver_id}`]).emit('message:new', message);
 
         res.writeHead(200, {'Content-Type': 'application/json'});
         res.end(JSON.stringify(saved_message));
