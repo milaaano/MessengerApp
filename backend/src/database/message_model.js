@@ -1,4 +1,3 @@
-import { send } from "process";
 import { Model } from "./model.js";
 export class Message extends Model {
     static updatable_columns = new Set(['picture', 'content']);

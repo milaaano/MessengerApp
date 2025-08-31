@@ -114,7 +114,7 @@ io.on("connection", (socket) => {
         userSocketsMap.get(userId).delete(socket.id);
         console.log(`Socket ${socket.id} was disconnected. Reason: ${message}`);
 
-        if (userSocketsMap[userId].size === 0) userSocketsMap.delete(userId);
+        if (userSocketsMap.get(userId).size === 0) userSocketsMap.delete(userId);
     });
 
 });

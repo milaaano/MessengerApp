@@ -2,4 +2,4 @@
 
 brew services start postgresql
 
-nodemon ./src/index.js
+node ./backend/src/index.js
